@@ -1,17 +1,16 @@
 import os
 import httpx
-from dotenv import load_dotenv
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from dotenv import load_dotenv
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List
 
-# 1. Setup FastAPI
-app = FastAPI(title="NutriScan AI Pro Backend")
+app = FastAPI(title="NutriScan AI Pro")
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,8 +18,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-load_dotenv()
 
+load_dotenv()
 groq_api_key = os.getenv("GROQ_API_KEY")
 
 llm = ChatGroq(
@@ -29,89 +28,73 @@ llm = ChatGroq(
     groq_api_key=groq_api_key
 )
 
-# 2. Define Data Models
 class IngredientItem(BaseModel):
     name: str
     sub: str
-    status: str # Safe, Caution, or Warning
+    status: str 
 
 class FoodAnalysis(BaseModel):
-    product_display_name: str = Field(description="The real-world name of the product")
+    product_display_name: str = Field(description="The actual name of the product")
+    brand_name: str = Field(description="The brand of the product")
     health_score: int
     eco_score: int
     alerts: List[str]
     ingredients: List[IngredientItem]
-    sustainability: dict = Field(default_factory=lambda: {"packaging": "Standard", "sourcing": "Unknown", "carbon": "Medium"})
+    sustainability: dict = Field(default_factory=lambda: {"origin": "Unknown", "packaging": "Standard", "production": "Industrial"})
 
 @app.get("/api/scan/{barcode}")
 async def scan_barcode(barcode: str):
-    headers = {"User-Agent": "NutriScanApp/1.0 (Bhavans College Project)"}
+    headers = {"User-Agent": "NutriScanApp/1.0"}
     
-    db_product_name = None
-    db_brand = "Generic"
-    ingredients_text = ""
-    image_url = "https://cdn-icons-png.flaticon.com/512/3081/3081918.png"
+    # 1. Try to get ANY hint from the API
+    api_data = {}
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            res = await client.get(f"https://world.openfoodfacts.org/api/v2/product/{barcode}.json", headers=headers)
+            if res.status_code == 200:
+                api_data = res.json().get("product", {})
+    except Exception:
+        pass # If API fails, we don't care, AI will handle it
 
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        # --- STRATEGY 1: Direct Barcode Lookup ---
-        try:
-            off_res = await client.get(f"https://world.openfoodfacts.org/api/v2/product/{barcode}.json", headers=headers)
-            if off_res.status_code == 200:
-                data = off_res.json()
-                if data.get("status") == 1:
-                    product = data.get("product", {})
-                    db_product_name = product.get("product_name") or product.get("product_name_en")
-                    db_brand = product.get("brands", "Generic")
-                    ingredients_text = product.get("ingredients_text") or product.get("ingredients_text_en", "")
-                    image_url = product.get("image_front_url") or product.get("image_url") or image_url
-        except Exception as e:
-            print(f"Barcode API error: {e}")
+    # 2. Extract whatever the API found (might be empty)
+    db_name = api_data.get("product_name") or api_data.get("product_name_en")
+    db_brand = api_data.get("brands")
+    db_ingredients = api_data.get("ingredients_text")
+    image_url = api_data.get("image_front_url") or "https://cdn-icons-png.flaticon.com/512/3081/3081918.png"
 
-    # --- STRATEGY 2: AI REASONING (The "Never Fail" Part) ---
-    # We ask the AI to determine the product name and analysis regardless of DB status
+    # 3. AI MASTER LOGIC: Identify and Analyze
     parser = JsonOutputParser(pydantic_object=FoodAnalysis)
-    
     prompt = ChatPromptTemplate.from_messages([
-        ("system", """You are a world-class nutritionist and food database expert.
-        Your goal is to identify and analyze a product based on a barcode or provided name.
+        ("system", """You are a World-Class Food Encyclopedia. 
+        Your primary job is to IDENTIFY the product associated with the barcode provided.
         
-        TASK:
-        1. If 'db_name' is provided, use it. If not, use the barcode to identify the product from your training data.
-        2. If the product is unknown to you, provide a generic but realistic analysis based on the product category implied by the brand or name.
-        3. ALWAYS return a valid JSON. Never say 'Product not found'.
-        
-        JSON STRUCTURE:
-        - product_display_name: (e.g., 'Parle-G Gluco Biscuits' or 'Maggi Noodles')
-        - health_score: (0-100)
-        - eco_score: (0-100)
-        - alerts: (List of health warnings)
-        - ingredients: (List of objects with 'name', 'sub', and 'status' [Safe, Caution, Warning])
-        - sustainability: (Object with 'packaging', 'sourcing', 'carbon')
+        STRICT INSTRUCTIONS:
+        1. If 'db_name' is missing or 'Unknown', use your internal knowledge to identify the product from the 'barcode'.
+        2. Example: 8901058000041 is Maggi, 8901262010015 is Amul Butter, 5449000196507 is Coca-Cola.
+        3. Even if you aren't 100% sure, identify the MOST LIKELY product for that barcode. 
+        4. NEVER return 'Generic Product' or 'Unknown'.
+        5. Analyze ingredients, health score, and sustainability accurately for that specific product.
         {format_instructions}"""),
-        ("user", f"Barcode: {barcode}, Database Name: {db_product_name}, Brand: {db_brand}, DB Ingredients: {ingredients_text}")
+        ("user", f"Identify and analyze this barcode: {barcode}. (API hints: Name: {db_name}, Brand: {db_brand}, Ingredients: {db_ingredients})")
     ]).partial(format_instructions=parser.get_format_instructions())
 
     chain = prompt | llm | parser
 
     try:
-        analysis = await chain.ainvoke({"barcode": barcode, "db_product_name": db_product_name})
-        # Overwrite the generic product name with the AI's identified name
-        final_name = analysis.get("product_display_name", db_product_name or f"Product {barcode}")
-    except Exception as e:
-        print(f"LLM Error: {e}")
-        final_name = db_product_name or f"Product {barcode}"
-        analysis = {
-            "health_score": 50,
-            "eco_score": 50,
-            "alerts": ["General composition analysis"],
-            "ingredients": [{"name": "Standard Ingredients", "sub": "Commonly found", "status": "Caution"}],
-            "sustainability": {"packaging": "Standard", "sourcing": "Mixed", "carbon": "Medium"}
-        }
+        analysis = await chain.ainvoke({"barcode": barcode})
+        # Use AI's identified name as the main name
+        final_name = analysis.get("product_display_name")
+        final_brand = analysis.get("brand_name")
+    except Exception:
+        # Emergency backup
+        final_name = db_name or f"Product {barcode}"
+        final_brand = db_brand or "Generic"
+        analysis = {"health_score": 50, "eco_score": 50, "alerts": [], "ingredients": [], "sustainability": {}}
 
     return {
         "barcode": barcode,
         "name": final_name,
-        "brand": db_brand,
+        "brand": final_brand,
         "image": image_url,
         "ai_analysis": analysis
     }
