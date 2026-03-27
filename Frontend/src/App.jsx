@@ -1,4 +1,6 @@
 import React from 'react';
+import {Menu, X} from 'lucide-react';
+import { useState } from 'react'
 import ScannerPage from './Scanning';
 import HowItWorks from './Tutorial';
 import Reviews from './Reviews';
@@ -9,6 +11,12 @@ import DemoPage from './Demo';
 import Features from './Feature';
 
 export default function NutriScanLanding() {
+
+  const tabs = ['Home', 'Contact' ]
+  const newUser = ['Login', 'Register']
+  const ta = ['Home', 'Contact', 'Login', 'Register']
+  const [isopen, setisopen] = useState(false)
+
   return (
     // Main Container - Uses system-ui fonts to avoid external calls
     <div className="min-h-screen bg-[#f8fff9] font-sans antialiased text-slate-800">
@@ -31,15 +39,41 @@ export default function NutriScanLanding() {
           </div>
           
           {/* Navigation - Hidden on Mobile */}
-          <div className="hidden md:flex items-center gap-10 text-sm font-bold uppercase tracking-widest text-slate-500">
-            <a href="#demo" className="hover:text-[#2ecc71] transition-colors">Demo</a>
-            <a href="#features" className="hover:text-[#2ecc71] transition-colors">Features</a>
-          </div>
+          <ul className="hidden md:flex items-center gap-10 text-sm font-bold uppercase tracking-widest text-slate-500">
+            
+              {tabs.map((tab, index) => (
+            <li className='text-black text-[15px] py-2 px-3 rounded-[10px] cursor-pointer overflow-hidden relative group hover:text-[#2ecc71]'>
+              <span className='relative z-10'>{tab}</span></li>
+            ))}
+          </ul>
           
-          {/* Action Button */}
-          <button className="bg-[#2ecc71] text-white px-7 py-3 rounded-full font-bold shadow-lg shadow-green-200 hover:bg-[#27ae60] transition-all active:scale-95">
-            Get Started
+{/* login register */}
+          <ul className="hidden md:flex items-center gap-5 text-sm font-bold uppercase tracking-widest text-slate-500">
+              
+            <li className='bg-white py-4 px-5 rounded-[10px] text-black border hover:text-white cursor-pointer overflow-hidden relative group'>
+              <span className='bg-gray-700 top-0 left-0 w-0 h-full absolute group-hover:w-full transition-all duration-300 z-0'></span>
+              <span className='relative z-10'>Login</span></li>
+            
+            <li className='bg-gray-800 py-4 px-5 rounded-[10px] text-white cursor-pointer overflow-hidden relative group'>
+              <span className='bg-gray-700 top-0 left-0 w-0 h-full absolute group-hover:w-full transition-all duration-300 z-0'></span>
+              <span className='relative z-10'>Register</span></li>
+          </ul>
+          
+          {/* hamburger */}
+          <button className='md:hidden relative flex justify-center items-center' onClick={() => setisopen(!isopen)}>
+            <Menu className={`absolute transition-all duration-300 ${isopen? 'opacity-0 rotate-90' : 'opacity-100 rotate-0' }`}/>
+            <X className={`absolute transition-all duration-300 ${isopen? 'opacity-100 rotate-0' : 'opacity-0 rotate-90'}`}/>
           </button>
+        </div>
+
+        
+        <div className='md:hidden relative'>
+          <ul className={`flex flex-col bg-white  absolute right-0 transition-all duration-300 gap-4 ${isopen? 'w-[80vw] h-[70vh] ': 'w-0 h-0'}`}>
+            {ta.map((t, index) => (
+            <li className='text-center mt-5 py-2 px-3 rounded-[10px] cursor-pointer overflow-hidden hover:text-[#2ecc71] text-black relative group'>
+              {t}</li>
+            ))}
+          </ul>
         </div>
       </nav>
 
@@ -90,15 +124,7 @@ export default function NutriScanLanding() {
         </div>
       </main>
 
-      {/* Footer / Features Preview */}
-      <footer className="max-w-7xl mx-auto px-6 border-t border-slate-100 py-12 flex flex-wrap justify-between gap-8 text-slate-400 font-medium text-sm">
-        <p>© 2026 NutriScan. Built for healthier choices.</p>
-        <div className="flex gap-8 uppercase tracking-widest text-[10px]">
-          <span>Privacy</span>
-          <span>Terms</span>
-          <span>Contact</span>
-        </div>
-      </footer>
+      
       <ScannerPage/>
       <HowItWorks/>
       <Reviews/>
