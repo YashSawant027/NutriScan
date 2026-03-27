@@ -12,9 +12,9 @@ import Features from './Feature';
 
 export default function NutriScanLanding() {
 
-  const tabs = ['Home', 'Contact' ]
+  const tabs = ['Home', 'Features' ]
   const newUser = ['Login', 'Register']
-  const ta = ['Home', 'Contact', 'Login', 'Register']
+  const ta = ['Home', 'Features', 'Login', 'Register']
   const [isopen, setisopen] = useState(false)
 
   return (
@@ -69,8 +69,12 @@ export default function NutriScanLanding() {
         
         <div className='md:hidden relative'>
           <ul className={`flex flex-col bg-white  absolute right-0 transition-all duration-300 gap-4 ${isopen? 'w-[80vw] h-[70vh] ': 'w-0 h-0'}`}>
-            {ta.map((t, index) => (
+            {tabs.map((t, index) => (
             <li className='text-center mt-5 py-2 px-3 rounded-[10px] cursor-pointer overflow-hidden hover:text-[#2ecc71] text-black relative group'>
+              {t}</li>
+            ))}
+            {newUser.map((t, index) => (
+            <li className='text-center mt-5 py-2 px-3 rounded-[10px] cursor-pointer overflow-hidden hover:text-[#2ecc71] text-white bg-black mx-8 relative group'>
               {t}</li>
             ))}
           </ul>
@@ -127,10 +131,11 @@ export default function NutriScanLanding() {
       
       <ScannerPage/>
       <HowItWorks/>
-      <Reviews/>
+      
       <FAQ/>
-      <DemoPage/>
-      <Features/>
+      <Reviews/>
+      {/* <DemoPage/> */}
+      {/* <Features/> */}
       <Footer/>
     </div>
   );
