@@ -85,7 +85,7 @@ export default function NutriScanner() {
   const handleSuccess = async (barcode) => {
     setIsProcessing(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/scan/${barcode}`);
+      const response = await fetch(`https://nutriscan-uadu.onrender.com/api/scan/${barcode}`);
       const data = await response.json();
       setScanResultData(data);
     } catch (error) {
