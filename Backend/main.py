@@ -28,7 +28,7 @@ llm = ChatGroq(
     groq_api_key=groq_api_key
 )
 
-# --- Updated Data Models ---
+# --- Data Models ---
 
 class IngredientItem(BaseModel):
     name: str
@@ -38,6 +38,8 @@ class IngredientItem(BaseModel):
 class AlternativeProduct(BaseModel):
     name: str = Field(description="Name of a healthier alternative product")
     reason: str = Field(description="Briefly explain why this is a better choice")
+    # NEW FIELD: Direct Search Link
+    link: str = Field(description="A Google search URL: https://www.google.com/search?q=buy+[product+name]")
 
 class FoodAnalysis(BaseModel):
     product_display_name: str
@@ -47,7 +49,7 @@ class FoodAnalysis(BaseModel):
     alerts: List[str]
     ingredients: List[IngredientItem]
     sustainability: dict
-    alternatives: List[AlternativeProduct] = Field(description="List of 3 healthy swaps")
+    alternatives: List[AlternativeProduct]
 
 @app.get("/api/scan/{barcode}")
 async def scan_barcode(barcode: str):
@@ -70,12 +72,12 @@ async def scan_barcode(barcode: str):
     parser = JsonOutputParser(pydantic_object=FoodAnalysis)
     prompt = ChatPromptTemplate.from_messages([
         ("system", """You are a World-Class Food Scientist. 
-        Identify the product and provide a deep analysis.
+        Analyze the product and suggest 3 healthy 'Smart Swaps'.
         
         STRICT RULES:
-        1. List 6-15 ingredients.
-        2. Classify status as 'Safe', 'Caution', or 'Warning'.
-        3. SMART SWAPS: Suggest 3 specific healthy alternatives available in the market (prioritize Indian brands like Yoga Bar, The Whole Truth, or organic options if applicable).
+        1. List 6-15 ingredients with safety status.
+        2. SMART SWAPS: Provide 3 specific products (e.g., 'Epigamia Greek Yogurt' instead of 'Sugar Yogurt').
+        3. LINK RULE: For each alternative, generate a Google Search 'buy' link.
         
         {format_instructions}"""),
         ("user", f"Barcode: {barcode}, Name: {db_name}, Brand: {db_brand}, Ingredients: {db_ingredients}")

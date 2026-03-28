@@ -42,10 +42,10 @@ export default function ScanResult({ data, onClose }) {
           <button onClick={onClose} className="p-2 bg-white rounded-full shadow-sm hover:bg-red-50 transition-colors"><X size={20}/></button>
         </div>
 
-        {/* Content */}
+        {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-8 pb-10 space-y-8 no-scrollbar">
           
-          {/* Scoring Rings */}
+          {/* Health & Eco Rings */}
           <div className="grid grid-cols-2 gap-4 bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm">
             <div className="text-center">
                <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
@@ -69,7 +69,7 @@ export default function ScanResult({ data, onClose }) {
             </div>
           </div>
 
-          {/* Smart Swaps - New Alternatives Section */}
+          {/* SMART SWAPS: Better Alternatives */}
           {alternatives.length > 0 && (
             <div className="space-y-4">
               <h3 className="text-[#2ecc71] font-black text-[10px] uppercase tracking-[0.2em] px-1 flex items-center gap-2">
@@ -77,7 +77,13 @@ export default function ScanResult({ data, onClose }) {
               </h3>
               <div className="grid gap-3">
                 {alternatives.map((alt, i) => (
-                  <div key={i} className="bg-white p-5 rounded-3xl border border-green-100 shadow-sm flex items-center justify-between group hover:border-[#2ecc71] transition-all">
+                  <a 
+                    key={i} 
+                    href={alt.link || `https://www.google.com/search?q=buy+${alt.name}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="bg-white p-5 rounded-3xl border border-green-100 shadow-sm flex items-center justify-between group hover:border-[#2ecc71] hover:bg-green-50/30 transition-all cursor-pointer"
+                  >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-green-50 rounded-2xl flex items-center justify-center text-[#2ecc71] group-hover:bg-[#2ecc71] group-hover:text-white transition-colors">
                         <ShieldCheck size={20} />
@@ -87,14 +93,17 @@ export default function ScanResult({ data, onClose }) {
                         <p className="text-[10px] text-slate-500 font-medium">{alt.reason}</p>
                       </div>
                     </div>
-                    <ArrowRight size={16} className="text-slate-300 group-hover:text-[#2ecc71] transition-colors" />
-                  </div>
+                    {/* The Arrow animates on hover of the whole card */}
+                    <div className="p-2 bg-slate-50 rounded-full group-hover:bg-[#2ecc71] group-hover:text-white transition-all">
+                      <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </a>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Ingredients */}
+          {/* Ingredient Analysis */}
           <div className="space-y-4">
             <h3 className="text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] px-1">Ingredient Analysis</h3>
             <div className="space-y-3">
