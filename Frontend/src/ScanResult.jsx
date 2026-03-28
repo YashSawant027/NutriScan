@@ -1,10 +1,19 @@
 import React from 'react';
-import { X, AlertCircle, ShieldCheck } from 'lucide-react';
+import { X, AlertCircle, ShieldCheck, Zap, ArrowRight } from 'lucide-react';
 
 export default function ScanResult({ data, onClose }) {
   if (!data) return null;
   const { ai_analysis = {} } = data;
-  const { product_display_name, brand_name, health_score = 0, eco_score = 0, ingredients = [], alerts = [], sustainability = {} } = ai_analysis;
+  const { 
+    product_display_name, 
+    brand_name, 
+    health_score = 0, 
+    eco_score = 0, 
+    ingredients = [], 
+    alerts = [], 
+    sustainability = {},
+    alternatives = [] 
+  } = ai_analysis;
 
   const getStatusTheme = (status) => {
     switch (status?.toLowerCase()) {
@@ -21,7 +30,7 @@ export default function ScanResult({ data, onClose }) {
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
       <div className="bg-[#F9F9F7] w-full max-w-lg max-h-[92vh] rounded-[3rem] shadow-2xl overflow-hidden relative flex flex-col animate-in zoom-in duration-300">
         
-        {/* Header Section */}
+        {/* Header */}
         <div className="p-8 pb-4 flex justify-between items-start">
           <div className="flex gap-4 items-center">
              <img src={data.image} alt="product" className="w-14 h-14 object-contain bg-white rounded-xl p-1 border shadow-sm" />
@@ -33,10 +42,10 @@ export default function ScanResult({ data, onClose }) {
           <button onClick={onClose} className="p-2 bg-white rounded-full shadow-sm hover:bg-red-50 transition-colors"><X size={20}/></button>
         </div>
 
-        {/* Scrollable Content */}
+        {/* Content */}
         <div className="flex-1 overflow-y-auto px-8 pb-10 space-y-8 no-scrollbar">
           
-          {/* Health & Eco Rings */}
+          {/* Scoring Rings */}
           <div className="grid grid-cols-2 gap-4 bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm">
             <div className="text-center">
                <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
@@ -60,24 +69,39 @@ export default function ScanResult({ data, onClose }) {
             </div>
           </div>
 
-          {/* Alerts */}
-          {alerts.length > 0 && (
-            <div className="bg-[#FFF5F5] border border-[#FEE2E2] rounded-3xl p-6 shadow-sm">
-              <h3 className="text-[#9B1C1C] font-black text-xs uppercase tracking-widest mb-4 flex items-center gap-2"><AlertCircle size={16} /> Health Alerts</h3>
-              <ul className="space-y-2">
-                {alerts.map((alert, i) => (<li key={i} className="text-[11px] font-bold text-[#9B1C1C] flex gap-2"><span>•</span> {alert}</li>))}
-              </ul>
+          {/* Smart Swaps - New Alternatives Section */}
+          {alternatives.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-[#2ecc71] font-black text-[10px] uppercase tracking-[0.2em] px-1 flex items-center gap-2">
+                <Zap size={14} fill="#2ecc71" className="text-[#2ecc71]" /> Better Alternatives
+              </h3>
+              <div className="grid gap-3">
+                {alternatives.map((alt, i) => (
+                  <div key={i} className="bg-white p-5 rounded-3xl border border-green-100 shadow-sm flex items-center justify-between group hover:border-[#2ecc71] transition-all">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-green-50 rounded-2xl flex items-center justify-center text-[#2ecc71] group-hover:bg-[#2ecc71] group-hover:text-white transition-colors">
+                        <ShieldCheck size={20} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-sm">{alt.name}</h4>
+                        <p className="text-[10px] text-slate-500 font-medium">{alt.reason}</p>
+                      </div>
+                    </div>
+                    <ArrowRight size={16} className="text-slate-300 group-hover:text-[#2ecc71] transition-colors" />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
-          {/* Ingredients List */}
+          {/* Ingredients */}
           <div className="space-y-4">
-            <h3 className="text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] px-1">Ingredient Intelligence</h3>
+            <h3 className="text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] px-1">Ingredient Analysis</h3>
             <div className="space-y-3">
               {ingredients.map((ing, i) => {
                 const theme = getStatusTheme(ing.status);
                 return (
-                  <div key={i} className={`p-5 rounded-[2rem] border ${theme.bg} ${theme.border} flex items-center justify-between shadow-sm transition-transform active:scale-95 cursor-pointer`}>
+                  <div key={i} className={`p-5 rounded-[2rem] border ${theme.bg} ${theme.border} flex items-center justify-between shadow-sm`}>
                     <div className="flex items-center gap-4">
                       <div className={`w-2 h-2 rounded-full ${theme.dot}`} />
                       <div className="flex flex-col">
@@ -92,7 +116,7 @@ export default function ScanResult({ data, onClose }) {
             </div>
           </div>
 
-          {/* Sustainability Grid */}
+          {/* Sustainability */}
           <div className="space-y-4">
             <h3 className="text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] px-1">Sustainability</h3>
             <div className="grid grid-cols-3 gap-3">
@@ -107,7 +131,11 @@ export default function ScanResult({ data, onClose }) {
 
         </div>
 
-        <div className="p-8 pt-0 bg-[#F9F9F7]"><button onClick={onClose} className="w-full bg-slate-900 text-white font-black py-5 rounded-[2rem] shadow-xl hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-95"><ShieldCheck size={20} className="text-emerald-500" /> Dismiss Analysis</button></div>
+        <div className="p-8 pt-0 bg-[#F9F9F7]">
+          <button onClick={onClose} className="w-full bg-slate-900 text-white font-black py-5 rounded-[2rem] shadow-xl hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-95">
+            <ShieldCheck size={20} className="text-emerald-500" /> Dismiss Analysis
+          </button>
+        </div>
       </div>
     </div>
   );
