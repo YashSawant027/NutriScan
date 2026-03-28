@@ -26,7 +26,6 @@ const RequireAuth = ({ children }) => {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter basename='/Queryla2.0/'></BrowserRouter>
       <BrowserRouter>
       
         <Routes>
