@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { Camera, Image as ImageIcon, Keyboard, X, ArrowRight } from 'lucide-react';
 import ScanResult from './ScanResult';
+import Navbar from './Navbar';
+
 
 export default function NutriScanner() {
 
@@ -149,6 +151,8 @@ export default function NutriScanner() {
 
 
   return (
+<>
+    <Navbar/>
 
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-10 text-slate-900 overflow-x-hidden">
 
@@ -388,7 +392,7 @@ export default function NutriScanner() {
 
       `}</style>
 
-    </div>
+    </div></>
 
   );
 

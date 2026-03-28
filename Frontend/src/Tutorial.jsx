@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 export default function HowItWorks() {
   const steps = [
@@ -47,44 +48,84 @@ export default function HowItWorks() {
     }
   ];
 
+  // Animation Variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2, // Time between each card animation
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" }
+    },
+  };
+
   return (
-    <div className="min-h-screen bg-white py-20 px-6 font-sans">
+    <div className="min-h-screen bg-white py-20 px-6 font-sans overflow-hidden">
       <div className="max-w-6xl mx-auto">
         
         {/* Section Header */}
-        <div className="text-center mb-20">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-20"
+        >
           <h2 className="text-[#2ecc71] font-bold uppercase tracking-[0.2em] text-sm mb-4">The Process</h2>
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">
             Advanced Intelligence <br className="hidden md:block"/> Behind Every Scan.
           </h1>
-        </div>
+        </motion.div>
 
         {/* Steps Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12"
+        >
           {steps.map((step) => (
-            <div key={step.id} className="group relative">
-              {/* Step Number Background */}
-              <span className="absolute -top-10 -left-4 text-8xl font-black text-slate-50 opacity-10 select-none group-hover:text-[#2ecc71] transition-colors duration-500">
+            <motion.div 
+              key={step.id} 
+              variants={itemVariants}
+              className="group relative"
+            >
+              {/* Animated Step Number Background */}
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.5 }}
+                whileInView={{ opacity: 0.1, scale: 1 }}
+                transition={{ duration: 1 }}
+                className="absolute -top-10 -left-4 text-8xl font-black text-slate-100 select-none group-hover:text-[#2ecc71] transition-colors duration-500"
+              >
                 {step.id}
-              </span>
+              </motion.span>
               
               {/* Content Card */}
               <div className="relative z-10">
-                <div className="w-16 h-16 bg-[#f0fff4] text-[#2ecc71] rounded-2xl flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                <motion.div 
+                  whileHover={{ rotate: 10, scale: 1.1 }}
+                  className="w-16 h-16 bg-[#f0fff4] text-[#2ecc71] rounded-2xl flex items-center justify-center mb-6 shadow-sm transition-transform duration-300"
+                >
                   {step.icon}
-                </div>
+                </motion.div>
                 <h3 className="text-xl font-bold text-slate-800 mb-3">{step.title}</h3>
                 <p className="text-slate-500 leading-relaxed text-sm md:text-base">
                   {step.description}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
-
-        
-
-        
+        </motion.div>
       </div>
     </div>
   );

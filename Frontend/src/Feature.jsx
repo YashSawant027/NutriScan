@@ -1,5 +1,7 @@
 import React from 'react';
 import { ScanFace, BrainCircuit, Globe, Leaf, ShieldCheck, Zap } from 'lucide-react';
+import Navbar from './Navbar'; // Import the new component
+import Footer from './Footer';
 
 export default function Features() {
   const mainFeatures = [
@@ -30,7 +32,11 @@ export default function Features() {
   ];
 
   return (
+    <>
+      <Navbar/>
+    
     <div className="min-h-screen bg-white py-24 px-6 font-sans">
+
       <div className="max-w-7xl mx-auto">
         
         {/* Header Section */}
@@ -92,5 +98,8 @@ export default function Features() {
 
       </div>
     </div>
+
+    <Footer/>
+    </>
   );
 }
