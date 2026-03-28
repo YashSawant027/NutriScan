@@ -1,151 +1,283 @@
 import React from 'react';
-import { X, AlertCircle, ShieldCheck, Zap, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { X, ShieldCheck, Zap, ArrowRight, Leaf, AlertTriangle, Activity } from 'lucide-react';
 
 export default function ScanResult({ data, onClose }) {
   if (!data) return null;
+
   const { ai_analysis = {} } = data;
-  const { 
-    product_display_name, 
-    brand_name, 
-    health_score = 0, 
-    eco_score = 0, 
-    ingredients = [], 
-    alerts = [], 
+
+  const {
+    product_display_name,
+    brand_name,
+    health_score = 0,
+    eco_score = 0,
+    ingredients = [],
+    overall_health_summary = "",
     sustainability = {},
-    alternatives = [] 
+    alternatives = []
   } = ai_analysis;
 
+
+  // Normalize AI Status (IMPORTANT)
+  const normalizeStatus = (status) => {
+    const s = status?.toLowerCase();
+
+    if (!s) return "Safe";
+
+    if (s.includes("safe")) return "Safe";
+    if (s.includes("danger")) return "Dangerous";
+    if (s.includes("caution")) return "Cautious";
+
+    return "Cautious"; // fallback
+  };
+
+
   const getStatusTheme = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'safe': return { bg: "bg-[#F0FFF4]", text: "text-[#2D6A4F]", border: "border-[#D1FAE5]", badge: "bg-[#2D6A4F] text-white", dot: "bg-[#2D6A4F]" };
-      case 'caution': return { bg: "bg-[#FFFBEB]", text: "text-[#B45309]", border: "border-[#FEF3C7]", badge: "bg-[#FF9F1C] text-white", dot: "bg-[#FF9F1C]" };
-      case 'warning': 
-      case 'harmful':
-        return { bg: "bg-[#FFF5F5]", text: "text-[#9B1C1C]", border: "border-[#FEE2E2]", badge: "bg-[#E74C3C] text-white", dot: "bg-[#E74C3C]" };
-      default: return { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-100", badge: "bg-slate-500 text-white", dot: "bg-slate-400" };
+    switch (normalizeStatus(status).toLowerCase()) {
+      case 'safe':
+        return {
+          color: "#10b981",
+          bg: "bg-emerald-500/10",
+          border: "border-emerald-500/20",
+          text: "text-emerald-600",
+          dark: "bg-emerald-600"
+        };
+
+      case 'cautious':
+        return {
+          color: "#f59e0b",
+          bg: "bg-amber-500/10",
+          border: "border-amber-500/20",
+          text: "text-amber-600",
+          dark: "bg-amber-500"
+        };
+
+      case 'dangerous':
+        return {
+          color: "#f43f5e",
+          bg: "bg-rose-500/10",
+          border: "border-rose-500/20",
+          text: "text-rose-600",
+          dark: "bg-rose-600"
+        };
+
+      default:
+        return {
+          color: "#64748b",
+          bg: "bg-slate-500/10",
+          border: "border-slate-500/20",
+          text: "text-slate-600",
+          dark: "bg-slate-500"
+        };
     }
   };
 
+
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-      <div className="bg-[#F9F9F7] w-full max-w-lg max-h-[92vh] rounded-[3rem] shadow-2xl overflow-hidden relative flex flex-col animate-in zoom-in duration-300">
-        
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-6 overflow-hidden">
+
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-xl"
+      />
+
+      <motion.div
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        className="bg-white w-full max-w-2xl h-full md:h-auto md:max-h-[90vh] rounded-t-[3rem] md:rounded-[3.5rem] shadow-xl relative flex flex-col overflow-hidden"
+      >
+
         {/* Header */}
-        <div className="p-8 pb-4 flex justify-between items-start">
-          <div className="flex gap-4 items-center">
-             <img src={data.image} alt="product" className="w-14 h-14 object-contain bg-white rounded-xl p-1 border shadow-sm" />
-             <div className="max-w-[240px]">
-                <h2 className="text-2xl font-black text-slate-800 leading-tight">{product_display_name || data.name}</h2>
-                <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">{brand_name || data.brand} — {data.barcode}</p>
-             </div>
+        <div className="sticky top-0 z-20 bg-white px-8 pt-10 pb-6 flex justify-between items-center border-b">
+
+          <div className="flex gap-5 items-center">
+            <img
+              src={data.image}
+              alt="product"
+              className="w-16 h-16 object-contain bg-white rounded-2xl p-2 border"
+            />
+
+            <div>
+              <h2 className="text-2xl font-black text-slate-900">
+                {product_display_name || data.name}
+              </h2>
+
+              <div className="flex gap-2 text-xs text-slate-400 font-bold">
+                <span>{brand_name || data.brand}</span>
+                <span>•</span>
+                <span>{data.barcode}</span>
+              </div>
+            </div>
           </div>
-          <button onClick={onClose} className="p-2 bg-white rounded-full shadow-sm hover:bg-red-50 transition-colors"><X size={20}/></button>
+
+          <button
+            onClick={onClose}
+            className="p-3 bg-slate-100 rounded-full hover:bg-rose-50"
+          >
+            <X size={20} />
+          </button>
+
         </div>
 
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-8 pb-10 space-y-8 no-scrollbar">
-          
-          {/* Health & Eco Rings */}
-          <div className="grid grid-cols-2 gap-4 bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm">
-            <div className="text-center">
-               <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-                  <svg className="w-full h-full -rotate-90">
-                    <circle cx="40" cy="40" r="35" stroke="#F1F5F9" strokeWidth="6" fill="none" />
-                    <circle cx="40" cy="40" r="35" stroke="#2D6A4F" strokeWidth="6" fill="none" strokeDasharray={220} strokeDashoffset={220 - (220 * health_score) / 100} strokeLinecap="round" />
-                  </svg>
-                  <span className="absolute text-xl font-black text-slate-800">{health_score}</span>
-               </div>
-               <p className="text-[10px] font-black uppercase text-slate-400 mt-2">Health Index</p>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-6 md:px-10 py-8 space-y-10">
+
+          {/* Scores */}
+          <div className="grid grid-cols-2 gap-4">
+
+            <div className="bg-white p-8 rounded-3xl border text-center">
+              <div className="text-5xl font-black">{health_score}</div>
+              <div className="text-xs text-slate-400 font-bold">
+                <ShieldCheck size={12} className="inline mr-1" />
+                Health Score
+              </div>
             </div>
-            <div className="text-center">
-               <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-                  <svg className="w-full h-full -rotate-90">
-                    <circle cx="40" cy="40" r="35" stroke="#F1F5F9" strokeWidth="6" fill="none" />
-                    <circle cx="40" cy="40" r="35" stroke="#FF9F1C" strokeWidth="6" fill="none" strokeDasharray={220} strokeDashoffset={220 - (220 * eco_score) / 100} strokeLinecap="round" />
-                  </svg>
-                  <span className="absolute text-xl font-black text-slate-800">{eco_score}</span>
-               </div>
-               <p className="text-[10px] font-black uppercase text-slate-400 mt-2">Eco Impact</p>
+
+            <div className="bg-emerald-900 text-white p-8 rounded-3xl text-center">
+              <div className="text-5xl font-black text-emerald-300">
+                {eco_score}
+              </div>
+              <div className="text-xs">
+                <Leaf size={12} className="inline mr-1" />
+                Eco Score
+              </div>
             </div>
+
           </div>
 
-          {/* SMART SWAPS: Better Alternatives */}
-          {alternatives.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-[#2ecc71] font-black text-[10px] uppercase tracking-[0.2em] px-1 flex items-center gap-2">
-                <Zap size={14} fill="#2ecc71" className="text-[#2ecc71]" /> Better Alternatives
-              </h3>
-              <div className="grid gap-3">
-                {alternatives.map((alt, i) => (
-                  <a 
-                    key={i} 
-                    href={alt.link || `https://www.google.com/search?q=buy+${alt.name}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-white p-5 rounded-3xl border border-green-100 shadow-sm flex items-center justify-between group hover:border-[#2ecc71] hover:bg-green-50/30 transition-all cursor-pointer"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-green-50 rounded-2xl flex items-center justify-center text-[#2ecc71] group-hover:bg-[#2ecc71] group-hover:text-white transition-colors">
-                        <ShieldCheck size={20} />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-slate-800 text-sm">{alt.name}</h4>
-                        <p className="text-[10px] text-slate-500 font-medium">{alt.reason}</p>
-                      </div>
-                    </div>
-                    {/* The Arrow animates on hover of the whole card */}
-                    <div className="p-2 bg-slate-50 rounded-full group-hover:bg-[#2ecc71] group-hover:text-white transition-all">
-                      <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-                    </div>
-                  </a>
-                ))}
+
+          {/* AI Summary */}
+          {overall_health_summary && (
+            <div className="bg-blue-50 p-6 rounded-3xl border">
+              <div className="flex gap-3">
+                <Activity className="text-blue-500" />
+                <p className="text-sm font-semibold text-slate-700">
+                  {overall_health_summary}
+                </p>
               </div>
             </div>
           )}
 
-          {/* Ingredient Analysis */}
+
+          {/* Ingredients */}
           <div className="space-y-4">
-            <h3 className="text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] px-1">Ingredient Analysis</h3>
-            <div className="space-y-3">
-              {ingredients.map((ing, i) => {
-                const theme = getStatusTheme(ing.status);
-                return (
-                  <div key={i} className={`p-5 rounded-[2rem] border ${theme.bg} ${theme.border} flex items-center justify-between shadow-sm`}>
-                    <div className="flex items-center gap-4">
-                      <div className={`w-2 h-2 rounded-full ${theme.dot}`} />
-                      <div className="flex flex-col">
-                        <h4 className={`font-bold text-sm ${theme.text}`}>{ing.name}</h4>
-                        <p className="text-[10px] opacity-60 font-bold uppercase tracking-tighter">{ing.sub}</p>
-                      </div>
+
+            <h3 className="text-xs font-black uppercase text-slate-400">
+              Ingredient Audit
+            </h3>
+
+            {ingredients.map((ing, i) => {
+
+              const status = normalizeStatus(ing.status);
+              const theme = getStatusTheme(status);
+
+              return (
+                <div
+                  key={i}
+                  className="bg-white p-6 rounded-3xl border space-y-3"
+                >
+
+                  <div className="flex justify-between">
+
+                    <div>
+                      <h4 className="font-black">{ing.name}</h4>
+                      <span className="text-xs text-slate-400">
+                        {ing.sub}
+                      </span>
                     </div>
-                    <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${theme.badge}`}>{ing.status}</span>
+
+                    <span
+                      className={`px-4 py-1 rounded-full text-xs font-black ${theme.bg} ${theme.text}`}
+                    >
+                      {status}
+                    </span>
+
                   </div>
-                );
-              })}
-            </div>
-          </div>
 
-          {/* Sustainability */}
-          <div className="space-y-4">
-            <h3 className="text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] px-1">Sustainability</h3>
-            <div className="grid grid-cols-3 gap-3">
-              {Object.entries(sustainability).map(([key, value]) => (
-                <div key={key} className="bg-white p-4 rounded-2xl text-center border border-slate-100 shadow-sm">
-                  <p className="text-[9px] font-black text-slate-300 uppercase mb-2 tracking-widest">{key}</p>
-                  <span className={`text-[9px] font-black px-2 py-1 rounded border ${value === 'Low' || value === 'Recyclable' || value === 'India' ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-orange-600 bg-orange-50 border-orange-100'}`}>{value}</span>
+                  {status !== "Safe" && (
+                    <div
+                      className={`p-4 rounded-xl ${theme.bg} border ${theme.border} flex gap-3`}
+                    >
+                      <AlertTriangle size={16} className={theme.text} />
+
+                      <p className={`text-xs ${theme.text}`}>
+                        {ing.health_risks}
+                      </p>
+
+                    </div>
+                  )}
+
                 </div>
-              ))}
-            </div>
+              );
+
+            })}
+
           </div>
 
+
+          {/* Alternatives */}
+          {alternatives.length > 0 && (
+            <div className="space-y-4">
+
+              <h3 className="text-xs font-black uppercase text-slate-400">
+                Better Alternatives
+              </h3>
+
+              {alternatives.map((alt, i) => (
+
+                <a
+                  key={i}
+                  href={alt.link}
+                  target="_blank"
+                  rel="noopener"
+                  className="block bg-emerald-50 p-6 rounded-3xl border"
+                >
+
+                  <div className="flex justify-between">
+
+                    <div>
+                      <h4 className="font-black">{alt.name}</h4>
+                      <p className="text-xs text-slate-600">
+                        {alt.reason}
+                      </p>
+                    </div>
+
+                    <ArrowRight />
+
+                  </div>
+
+                </a>
+
+              ))}
+
+            </div>
+          )}
+
         </div>
 
-        <div className="p-8 pt-0 bg-[#F9F9F7]">
-          <button onClick={onClose} className="w-full bg-slate-900 text-white font-black py-5 rounded-[2rem] shadow-xl hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-95">
-            <ShieldCheck size={20} className="text-emerald-500" /> Dismiss Analysis
+
+        {/* Footer */}
+        <div className="p-8 border-t bg-white">
+
+          <button
+            onClick={onClose}
+            className="w-full bg-slate-900 text-white py-5 rounded-3xl font-black"
+          >
+            Log to Health Dashboard
           </button>
+
         </div>
-      </div>
+
+      </motion.div>
+
     </div>
   );
 }

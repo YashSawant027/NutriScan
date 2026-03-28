@@ -1,158 +1,128 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
+const TESTIMONIALS = [
+  {
+    id: 1,
+    content: "Finally, an app that doesn't just show calories but actually explains the chemicals. It changed how I shop for my kids.",
+    author: "Sarah Jenkins",
+    role: "Health Coach",
+    rating: 5,
+    size: "large", // This will take more space
+    avatar: "https://i.pravatar.cc/150?u=sarah"
+  },
+  {
+    id: 2,
+    content: "The barcode scanner is lightning fast. Faster than Yuka or Foodvisor.",
+    author: "Marc Andre",
+    role: "Athlete",
+    rating: 5,
+    size: "small",
+    avatar: "https://i.pravatar.cc/150?u=marc"
+  },
+  {
+    id: 3,
+    content: "As someone with a severe nut allergy, the 'Persona' mode is a literal lifesaver. It flags cross-contamination risks I used to miss.",
+    author: "Elena Rodriguez",
+    role: "Verified User",
+    rating: 5,
+    size: "medium",
+    avatar: "https://i.pravatar.cc/150?u=elena"
+  },
+  {
+    id: 4,
+    content: "The clean UI and the 1-100 scoring system make nutrition actually fun to track.",
+    author: "James Chen",
+    role: "Software Engineer",
+    rating: 5,
+    size: "small",
+    avatar: "https://i.pravatar.cc/150?u=james"
+  },
+  {
+    id: 5,
+    content: "I love the sustainability metrics. Knowing the carbon footprint of my snacks helps me shop more consciously.",
+    author: "Mia Thorne",
+    role: "Eco-Activist",
+    rating: 5,
+    size: "medium",
+    avatar: "https://i.pravatar.cc/150?u=mia"
+  }
+];
+
 export default function Reviews() {
-  const reviews = [
-    {
-      id: 1,
-      name: "Aditya Sharma",
-      role: "Fitness Enthusiast",
-      initials: "AS",
-      rating: 5,
-      date: "March 15, 2026",
-      comment: "NutriScan has completely changed how I shop. I never realized how much hidden sugar was in my 'healthy' yogurt. The AI simplification is a lifesaver!",
-      verified: true
-    },
-    {
-      id: 2,
-      name: "Priya Kapur",
-      role: "Mother of Two",
-      initials: "PK",
-      rating: 5,
-      date: "March 10, 2026",
-      comment: "Finally, an app that explains ingredients in plain English. Identifying allergens is so much faster now. Highly recommended for parents.",
-      verified: true
-    },
-    {
-      id: 3,
-      name: "Rahul Varma",
-      role: "Student",
-      initials: "RV",
-      rating: 4,
-      date: "February 28, 2026",
-      comment: "The sustainability score is a great touch. It's not just about my health, but the planet's health too. Great UI and very fast scanning.",
-      verified: true
-    }
-  ];
-
-  // Animation Variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.15 }
-    }
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 40 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
-  };
-
-  const Stars = ({ fill }) => (
-    <div className="flex gap-1">
-      {[...Array(5)].map((_, i) => (
-        <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill={i < fill ? "#f1c40f" : "#e2e8f0"}>
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-        </svg>
-      ))}
-    </div>
-  );
-
   return (
-    <div className="min-h-screen bg-[#fcfdfd] py-24 px-6 font-sans overflow-hidden">
-      <div className="max-w-6xl mx-auto">
+    <section className="py-24 px-6 bg-[#fcfdfc]">
+      <div className="max-w-7xl mx-auto">
         
-        {/* Header Section */}
-        <motion.div 
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8"
-        >
-          <div>
-            <h2 className="text-[#2ecc71] font-bold uppercase tracking-widest text-xs mb-3">User Feedback</h2>
-            <h1 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">
-              What our community <br/> is saying.
-            </h1>
-          </div>
-          
-          <motion.div 
-            whileHover={{ scale: 1.05 }}
-            className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-6"
+        {/* Header */}
+        <div className="text-center mb-16">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 mb-4"
           >
-            <div className="text-center">
-              <span className="block text-4xl font-black text-slate-900">4.9</span>
-              <Stars fill={5} />
-            </div>
-            <div className="h-12 w-px bg-slate-100"></div>
-            <p className="text-sm text-slate-500 font-medium leading-tight">
-              Based on 1,200+ <br/> scanned products.
-            </p>
-          </motion.div>
-        </motion.div>
+            Loved by <span className="text-green-500">50,000+</span> health seekers.
+          </motion.h2>
+          <p className="text-slate-500 text-lg">Real stories from people who took control of their plate.</p>
+        </div>
 
-        {/* Reviews Grid */}
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-          {reviews.map((review) => (
-            <motion.div 
-              key={review.id} 
-              variants={cardVariants}
-              whileHover={{ 
-                y: -10, 
-                boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" 
-              }}
-              className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-50 transition-all duration-300 flex flex-col justify-between"
+        {/* Bento Review Grid */}
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+          {TESTIMONIALS.map((review, i) => (
+            <motion.div
+              key={review.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className={`break-inside-avoid bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-green-100 transition-all group relative overflow-hidden`}
             >
-              <div>
-                <div className="flex justify-between items-start mb-6">
-                  <motion.div 
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.8 }}
-                    className="w-12 h-12 bg-green-50 text-[#2ecc71] rounded-2xl flex items-center justify-center font-bold text-lg"
-                  >
-                    {review.initials}
-                  </motion.div>
-                  {review.verified && (
-                    <motion.span 
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="flex items-center gap-1 text-[10px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded-full uppercase tracking-tighter"
-                    >
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
-                      Verified
-                    </motion.span>
-                  )}
-                </div>
-
-                <Stars fill={review.rating} />
-                
-                <p className="text-slate-600 mt-6 leading-relaxed italic font-medium">
-                  "{review.comment}"
-                </p>
+              {/* Subtle Quote Icon */}
+              <div className="absolute -top-2 -right-2 text-slate-50 opacity-[0.05] text-8xl font-black group-hover:text-green-50 transition-colors">
+                “
               </div>
 
-              <div className="mt-8 pt-6 border-t border-slate-50">
-                <h4 className="font-bold text-slate-900">{review.name}</h4>
-                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">
-                  {review.role} • {review.date}
-                </p>
+              {/* Stars */}
+              <div className="flex gap-1 mb-6">
+                {[...Array(review.rating)].map((_, i) => (
+                  <span key={i} className="text-amber-400 text-sm">★</span>
+                ))}
+              </div>
+
+              <p className="text-slate-700 text-lg leading-relaxed mb-8 relative z-10">
+                "{review.content}"
+              </p>
+
+              <div className="flex items-center gap-4 border-t border-slate-50 pt-6">
+                <img 
+                  src={review.avatar} 
+                  alt={review.author} 
+                  className="w-12 h-12 rounded-full grayscale group-hover:grayscale-0 transition-all duration-500"
+                />
+                <div>
+                  <h4 className="font-bold text-slate-900 flex items-center gap-1">
+                    {review.author}
+                    <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 011.414 1.414z" />
+                    </svg>
+                  </h4>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{review.role}</p>
+                </div>
               </div>
             </motion.div>
           ))}
+        </div>
+
+        {/* Bottom CTA */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          className="mt-16 text-center"
+        >
+          
         </motion.div>
       </div>
-    </div>
+    </section>
   );
 }
