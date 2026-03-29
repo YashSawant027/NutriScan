@@ -67,7 +67,6 @@ class FoodAnalysis(BaseModel):
 async def scan_barcode(barcode: str):
 
     headers = {"User-Agent": "NutriScanApp/1.0"}
-
     api_data = {}
 
     try:
@@ -103,7 +102,9 @@ async def scan_barcode(barcode: str):
 
 Your job is to analyze packaged food scientifically.
 
-STRICT RULES:
+-----------------------------
+STRICT RULES
+-----------------------------
 
 1. INGREDIENT COUNT
 You MUST list between 6 and 15 ingredients.
@@ -111,91 +112,121 @@ You MUST list between 6 and 15 ingredients.
 2. STATUS VALUES
 Each ingredient MUST be ONLY:
 
-- Safe
-- Cautious
-- Dangerous
+Safe  
+Cautious  
+Dangerous
 
-Do NOT use:
-
-- Generally Recognized as Safe
-- Moderate
-- Low Risk
-- High Risk
-- Neutral
-- Unknown
-
-ONLY USE:
-Safe / Cautious / Dangerous
+DO NOT USE ANY OTHER WORDING.
 
 3. DANGEROUS INGREDIENTS
 
 Mark as Dangerous:
 
-Artificial Colors:
-Red 40
-Yellow 5
-Blue 1
+Artificial Colors  
+Red 40  
+Yellow 5  
+Blue 1  
 
-Preservatives:
-BHA
-BHT
-TBHQ
+Preservatives  
+BHA  
+BHT  
+TBHQ  
 
-Sweeteners:
-High Fructose Corn Syrup
-Aspartame
-Sucralose
+Sweeteners  
+High Fructose Corn Syrup  
+Aspartame  
+Sucralose  
 
-Oils:
-Hydrogenated oils
+Oils  
+Hydrogenated oils  
 Palm oil (processed)
 
-Additives:
-MSG
-Artificial flavors
+Additives  
+MSG  
+Artificial flavors  
 Artificial sweeteners
 
 4. CAUTIOUS INGREDIENTS
 
-Mark as Cautious:
-
-Refined sugar
-Refined flour
-Salt
-Vegetable oil
-Emulsifiers
-Thickeners
+Refined sugar  
+Refined flour  
+Salt  
+Vegetable oil  
+Emulsifiers  
+Thickeners  
 
 5. SAFE INGREDIENTS
 
-Mark as Safe:
+Whole grains  
+Milk  
+Natural cocoa  
+Nuts  
+Fruits  
+Natural ingredients  
 
-Whole grains
-Milk
-Natural cocoa
-Nuts
-Fruits
-Natural ingredients
+-----------------------------
+ALTERNATIVE RULES
+-----------------------------
 
-6. REQUIREMENT
+You MUST detect food category:
+
+Examples:
+
+Biscuit → Healthy biscuits  
+Chips → Healthy chips  
+Chocolate → Healthy chocolates  
+Soft drink → Healthy drinks  
+Noodles → Healthy noodles  
+Bread → Healthy bread  
+
+Suggest 3 healthier alternatives:
+
+Rules:
+
+Same category only  
+No fruits unless beverage  
+No different food category  
+
+Example:
+
+Bad:
+
+Oreo → Apple ❌
+
+Good:
+
+Oreo → Whole Wheat Biscuit ✅
+
+Each alternative MUST include:
+
+name  
+reason  
+link  
+
+Google Link Format:
+
+https://www.google.com/search?q=buy+[product name]
+
+Example:
+
+https://www.google.com/search?q=buy+ragi+biscuits
+
+Return EXACTLY 3 alternatives.
+
+-----------------------------
 
 You MUST include:
 
-- At least 1 Dangerous ingredient
-- At least 2 Cautious ingredients
+1 Dangerous ingredient  
+2 Cautious ingredients  
 
-7. ALTERNATIVES
-
-Suggest 3 healthier alternatives  
-Same category only
-
-8. RETURN ONLY JSON
+Return ONLY JSON
 
 {format_instructions}
 """),
 
-        ("user",
-         f"Barcode: {barcode}, Name: {db_name}, Brand: {db_brand}, Ingredients: {db_ingredients}")
+("user",
+ f"Barcode: {barcode}, Name: {db_name}, Brand: {db_brand}, Ingredients: {db_ingredients}")
     ]).partial(format_instructions=parser.get_format_instructions())
 
     chain = prompt | llm | parser
