@@ -41,7 +41,7 @@ function Login() {
                 <form onSubmit={handleLogin} className='space-y-5'>
                     <div>
                         <label className='block text-xs font-black uppercase tracking-widest text-slate-400 mb-2'>Username</label>
-                        <input type="text" onChange={(e)=>setusername(e.target.value)} className='w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 focus:border-[#2ecc71] outline-none font-bold transition-all' placeholder='e.g. Kavi'/>
+                        <input type="text" onChange={(e)=>setusername(e.target.value)} className='w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 focus:border-[#2ecc71] outline-none font-bold transition-all' placeholder='e.g. alex'/>
                         {error.username && <p className="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-tighter">{error.username}</p>}
                     </div>
                     <div>

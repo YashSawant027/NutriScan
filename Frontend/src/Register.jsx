@@ -68,7 +68,7 @@ function Register() {
                                 required
                                 onChange={(e) => setUsername(e.target.value)}
                                 className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-5 focus:border-[#2ecc71] focus:bg-white outline-none font-bold transition-all"
-                                placeholder="alex_johnson" 
+                                placeholder="alex" 
                             />
                         </div>
                         {error.username && <p className="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-tighter px-1">{error.username}</p>}
