@@ -56,10 +56,13 @@ export default function Navbar() {
           <li className="hover:text-[#2ecc71] transition">
             <Link to="/">Home</Link>
           </li>
-
+<li className="hover:text-[#2ecc71] transition">
+            <Link to="/profile">Profile</Link>
+          </li>
           <li className="hover:text-[#2ecc71] transition">
             <Link to="/features">Features</Link>
           </li>
+          
 
         </ul>
 
@@ -160,13 +163,20 @@ export default function Navbar() {
           >
             Home
           </Link>
-
+<Link
+            to="/profile"
+            className="text-lg font-bold text-slate-700 hover:text-[#2ecc71]"
+          >
+            Profile
+          </Link>
           <Link
             to="/features"
             className="text-lg font-bold text-slate-700 hover:text-[#2ecc71]"
           >
             Features
           </Link>
+
+          
 
 
 

@@ -6,6 +6,7 @@ import NutriScanLanding from './Home';
 import Login from './Login';
 import Register from './Register';
 import NutriScanner from './Scanning';
+import PersistedProfileSystem from './Profile';
 
 /**
  * INTERNAL HELPER: RequireAuth
@@ -34,6 +35,7 @@ function App() {
           <Route path="/features" element={<Features />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<PersistedProfileSystem/>} />
           
           {/* Protected Route - Only logged-in users */}
           <Route 

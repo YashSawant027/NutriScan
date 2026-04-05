@@ -1,8 +1,39 @@
-import React from 'react';
+import React, { useEffect } from 'react'; // Ensure useEffect is imported
 import { motion } from 'framer-motion';
 import { X, ShieldCheck, Zap, ArrowRight, Leaf, AlertTriangle, Activity } from 'lucide-react';
 
 export default function ScanResult({ data, onClose }) {
+  // --- Enhanced History Persistence Logic ---
+  useEffect(() => {
+    if (data && data.ai_analysis) {
+      // 1. Retrieve existing history
+      const existingHistory = JSON.parse(localStorage.getItem('scan_history') || '[]');
+      
+      // 2. Prevent duplicate entries by checking the barcode
+      const isDuplicate = existingHistory.some(item => item.barcode === data.barcode);
+      
+      if (!isDuplicate) {
+        // 3. Create a clean history object
+        const historyEntry = {
+          id: Date.now(),
+          timestamp: new Date().toLocaleString(),
+          // CRITICAL: Save the full data object so it can be re-passed to ScanResult from history
+          fullData: data, 
+          name: data.ai_analysis.product_display_name || data.name,
+          brand: data.ai_analysis.brand_name || data.brand,
+          image: data.image,
+          health_score: data.ai_analysis.health_score || 0,
+          eco_score: data.ai_analysis.eco_score || 0,
+          barcode: data.barcode
+        };
+        
+        // 4. Update localStorage (newest first)
+        localStorage.setItem('scan_history', JSON.stringify([historyEntry, ...existingHistory]));
+      }
+    }
+  }, [data]);
+  // ------------------------------------------
+
   if (!data) return null;
 
   const { ai_analysis = {} } = data;

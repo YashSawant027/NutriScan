@@ -129,7 +129,7 @@ export default function NutriScanner() {
     try {
 
       const response = await fetch(
-        `https://nutriscan-7hh9.onrender.com/api/scan/${barcode}`
+        `https://nutriscan-kqrm.onrender.com/api/scan/${barcode}`
       );
 
       const data = await response.json();

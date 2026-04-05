@@ -9,6 +9,7 @@ import FAQ from './Faq';
 import Footer from './Footer';
 import ModernCarousel from './ModernCarousel';
 import FeatureShowcase from './FeatureShowcase';
+import Profile from './Profile';
 
 export default function NutriScanLanding() {
   const navigate = useNavigate();
@@ -170,6 +171,7 @@ export default function NutriScanLanding() {
       <section className="relative z-10 bg-white border-t border-slate-100">
         <ModernCarousel/>
         <FeatureShowcase/>
+        
         <HowItWorks />
         <FAQ />
         <Reviews />
